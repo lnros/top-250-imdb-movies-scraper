@@ -7,10 +7,11 @@ Checking how handling concurrency well can improve time efficiency in your code 
 
 This code extracts title and director's name for each movie using both methods and compares their execution time.
 
-The webpage used for scraping is: [https://www.imdb.com/chart/top?ref_=nv_mv_250][https://www.imdb.com/chart/top?ref_=nv_mv_250].
+The webpage used for scraping is: [https://www.imdb.com/chart/top?ref_=nv_mv_250][top250].
 
 ### Usage
 From the command line
 ```bash
 $ python main.py
 ```
+[top250]: https://www.imdb.com/chart/top?ref_=nv_mv_250
