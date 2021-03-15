@@ -63,13 +63,25 @@ class IMDBScraper:
             cfg.logger.critical("A webpage content was expected, got None instead.")
         return self._parse_title_director(r)
 
+
+    @staticmethod
+    def measure_time(func):
+        def func_with_measure_time(*args, **kwargs):
+            before_time = time.time()
+            result = func(*args, **kwargs)
+            time_took = time.time() - before_time
+            print(f'It took {func.__name__} {int(time_took)} seconds to execute')
+            return result
+        return func_with_measure_time
+    
+
+    @measure_time
     def scrape_one_by_one(self, urls):
         """
         Given a list of IMDB's movies urls, it prints the movies' titles and directors.
         It does so one at a time.
         """
         cfg.logger.info("Starting one by one")
-        start_time = time.time()
         for i, url in enumerate(urls):
             title, director = self._get_title_director(cfg.MAIN_URL + url)
             if title and director:
@@ -78,7 +90,6 @@ class IMDBScraper:
                 print(f"{i + 1} - {title}- {director}")
             else:
                 cfg.logger.error(f"Movie number {i + 1} info not found")
-        print(f"One by one takes: {time.time() - start_time:.2f} seconds")
 
     def _get_batch_title_director(self, batch):
         """
@@ -101,13 +112,13 @@ class IMDBScraper:
             directors.append(director)
         return titles, directors
 
+    @measure_time
     def scrape_in_batches(self, urls):
         """
         Given a list of IMDB's movies urls, it prints the movies' titles and directors.
         It does so in batches, working in parallel threads by using grequests.
         """
         cfg.logger.info("Starting in batches")
-        start_time = time.time()
         for i in range(0, len(urls), cfg.BATCH):
             batch = [cfg.MAIN_URL + url for url in urls[i:i + cfg.BATCH]]
             titles, directors = self._get_batch_title_director(batch)
@@ -117,5 +128,3 @@ class IMDBScraper:
                     print(f"{j + i + 1} - {movie_info[cfg.TITLE_ZIP_IDX]}- {movie_info[cfg.DIRECTOR_ZIP_IDX]}")
             else:
                 cfg.logger.error(f"Batch starting in index urls[{i}] went wrong.")
-
-        print(f"In batches takes: {time.time() - start_time:.2f} seconds")
